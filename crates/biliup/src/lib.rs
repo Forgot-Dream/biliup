@@ -17,7 +17,7 @@ where
     F: FnMut() -> Fut,
     Fut: Future<Output = Result<O, E>>,
 {
-    retry_with_config(f, 3, None::<fn(&E) -> bool>).await
+    retry_with_config(f, 5, None::<fn(&E) -> bool>).await
 }
 
 pub async fn retry_with_config<F, Fut, O, E, P>(

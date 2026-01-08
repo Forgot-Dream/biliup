@@ -139,9 +139,16 @@ where
     pin!(rx);
     // 流式处理后续事件
     while let Some(event) = rx.next().await {
-        let video = upload_single_file(&event.prev_file_path, context).await?;
-        uploaded.videos.push(video);
-        uploaded.paths.push(event.prev_file_path);
+        match upload_single_file(&event.prev_file_path, context).await {
+            Ok(video) => {
+                uploaded.videos.push(video);
+                uploaded.paths.push(event.prev_file_path);
+            }
+            Err(e) => {
+                error!(error=?e, file=?event.prev_file_path, "上传失败，跳过并不参与后处理");
+                continue;
+            }
+        }
         // 失败的文件不加入路径列表，避免后处理出错
     }
 
